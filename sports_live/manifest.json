@@ -1,0 +1,19 @@
+{
+  "name": "test",
+  "description": "chrome extension for customize CSS and JS.",
+  "version": "1.0.0",
+  "manifest_version": 2,
+  "web_accessible_resources": ["*"],
+  "permissions": ["storage", "background", "<all_urls>"],
+  "background": {
+    "scripts": ["js/background.js"],
+    "persistent": false
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "css": ["css/style.css"],
+      "js": ["js/jquery-3.4.0.min.js", "js/script.js"]
+    }
+  ]
+}

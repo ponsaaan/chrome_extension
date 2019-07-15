@@ -5,7 +5,7 @@ $('body').before('<div id="flash"></div>');
 setInterval(function(){
   sender();
   console.log("ループ中");
-},10000);
+},5000);
 
 // backgroundにリクエストを送る処理
 function sender() {
@@ -33,19 +33,25 @@ function display() {
 }
 
 function handleMsg(msg) {
+  // 全てgoogle.comへのリンクを設定する
   const t = document.createElement('div');
+  const a = document.createElement('a');
+  a.setAttribute('href', 'https://www.google.com/');
+  a.innerText = msg;
+  t.appendChild(a)
+
   const effect = [{
     left: window.innerWidth + 'px'
   }, {
     left: -t.offsetWidth + 'px'
   }]
+
   const timing = {}
   timing.duration = (10000) * (window.innerWidth + t.offsetWidth) / window.innerWidth
   timing.iterations = 1
   timing.easing = 'linear'
 
   // メッセージのフォント
-  t.innerText = msg;
   t.style.position = 'fixed'
   t.style.left = window.innerWidth + 'px'
   t.style.top = 5 + 'px'

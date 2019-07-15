@@ -1,6 +1,6 @@
 {
-  "name": "test",
-  "description": "chrome extension for customize CSS and JS.",
+  "name": "blast post",
+  "description": "blast post for us.",
   "version": "1.0.0",
   "manifest_version": 2,
   "web_accessible_resources": ["*"],

@@ -26,13 +26,13 @@ request.send(null);
 // scriptからリクエストが飛んできたら実行される処理
 chrome.runtime.onMessage.addListener(function (request, _, sendResponse) {
   if(request.status == "start") {
-  let newMsg
+    let newMsg
     // 新しいメッセージがあるかどうかをチェック
-    let isExist = checker(2019062301, 'value', '1回表')
+    let existKey = checker(2019062301, 'value')
 
     // ID=2019062301, インデックスが0番目の新しいメッセージを取得
-    if(isExist) {
-      newMsg = getter(2019062301, 'value', '1回表');
+    if(existKey) {
+      newMsg = getter(2019062301, 'value', existKey);
     } else {
       newMsg = '新しいメッセージはありません'
     }
@@ -48,30 +48,34 @@ chrome.runtime.onMessage.addListener(function (request, _, sendResponse) {
 });
 
 // 新しく値が入っているかをチェックする
-function checker(id, value, msgKey) {
+function checker(id, value) {
 
   // idが違えばfalse
 　if(id != 2019062301) {
-    return false;
+    return;
   }
 
   // そもそも何もなければfalse
   if(Object.keys(msgDict[value]).length == 0) {
-    return false;
+    return;
   }
 
   // メッセージが存在しなければfalse
-  if(msgDict[value][msgKey].length == 0) {
-    return false;
+  for(key in msgDict[value]) {
+    if(msgDict[value][key].length == 0) {
+      return;
+    } else {
+      return key
+    }
   }
-
-  return true;
+  return;
 }
 
 // 新しいメッセージを取得する
-function getter(id, value, msgKey) {
-  let msgDescription = msgDict[value][msgKey]
-  // 配列の左から順番に取り出す.
+function getter(id, value, existKey) {
+
+  let msgDescription = msgDict[value][existKey]
+  // 配列の一番最初を取り出す
   newMsg = msgDescription[0]
   // 一度取り出したら削除
   msgDescription.shift()

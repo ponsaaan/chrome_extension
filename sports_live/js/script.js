@@ -1,4 +1,3 @@
-
 $('body').before('<div id="dammie"></div>');
 $('body').before('<div id="flash"></div>');
 

@@ -1,15 +1,18 @@
+const TRANSMISSION_INTERVAL_MS = 8000;
+const DISPLAY_TIME_MS = 10000;
+
 $('body').before('<div id="dammie"></div>');
 $('body').before('<div id="flash"></div>');
 
 // 1分ごとにbackgroundと通信を行う処理
-setInterval(function(){
+setInterval(() => {
   sender();
   console.log("ループ中");
-},5000);
+}, TRANSMISSION_INTERVAL_MS);
 
 // backgroundにリクエストを送る処理
 function sender() {
-  chrome.runtime.sendMessage({ status: "start" }, function (response) {
+  chrome.runtime.sendMessage({ status: "start" }, (response) => {
   
     if(response.status == "go") {
       console.log("displayメソッドを実行します");
@@ -24,8 +27,8 @@ function sender() {
 
 // storageに'msg'というkeyで保存されているメッセージを取得して表示する
 function display() {
-  chrome.storage.sync.get(['msg'], function(result) {
-    var answerText = result.msg;
+  chrome.storage.sync.get(['msg'], (result) => {
+    let answerText = result.msg;
     console.log("storageから" + answerText + "を取得しました");
     console.log("#flashを書き換えます");
     handleMsg(answerText);
@@ -34,39 +37,39 @@ function display() {
 
 function handleMsg(msg) {
   // 全てgoogle.comへのリンクを設定する
-  const t = document.createElement('div');
-  const a = document.createElement('a');
-  a.setAttribute('href', 'https://www.google.com/');
-  a.innerText = msg;
-  t.appendChild(a)
+  const DIV = document.createElement('div');
+  const A_TAG = document.createElement('a');
+  A_TAG.setAttribute('href', 'https://www.google.com/');
+  A_TAG.innerText = msg;
+  DIV.appendChild(A_TAG)
 
-  const effect = [{
+  const EFFECT = [{
     left: window.innerWidth + 'px'
   }, {
-    left: -t.offsetWidth + 'px'
+    left: -DIV.offsetWidth + 'px'
   }]
 
-  const timing = {}
-  timing.duration = (10000) * (window.innerWidth + t.offsetWidth) / window.innerWidth
-  timing.iterations = 1
-  timing.easing = 'linear'
+  const TIMING = {}
+  TIMING.duration = (DISPLAY_TIME_MS) * (window.innerWidth + DIV.offsetWidth) / window.innerWidth
+  TIMING.iterations = 1
+  TIMING.easing = 'linear'
 
   // メッセージのフォント
-  t.style.position = 'fixed'
-  t.style.left = window.innerWidth + 'px'
-  t.style.top = 5 + 'px'
-  t.style.fontSize = 16 + 'px'
-  t.style.fontWeight = 'bold'
-  t.style.color = '#000000'
-  t.style.whiteSpace = 'pre'
-  t.style.zIndex = 2147483647
+  DIV.style.position = 'fixed'
+  DIV.style.left = window.innerWidth + 'px'
+  DIV.style.top = 5 + 'px'
+  DIV.style.fontSize = 16 + 'px'
+  DIV.style.fontWeight = 'bold'
+  DIV.style.color = '#000000'
+  DIV.style.whiteSpace = 'pre'
+  DIV.style.zIndex = 2147483647
 
-  document.body.appendChild(t)
+  document.body.appendChild(DIV)
 
   // 右から左へ流すアニメーション
   // アニメーションが終わるタイミングでメッセージを削除
-  t.animate(effect, timing).onfinish = function () {
-    document.body.removeChild(t)
+  DIV.animate(EFFECT, TIMING).onfinish = () => {
+    document.body.removeChild(DIV)
   }
 }
 

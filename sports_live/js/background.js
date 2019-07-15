@@ -1,12 +1,10 @@
-console.log("hello!!");
-
 // とりあえず静的に保存
 let msgDict = {}
 let url = 'https://pu1yzwrjuh.execute-api.ap-northeast-1.amazonaws.com/prod?ID=2019062301'
 
-var request = new XMLHttpRequest();
+let request = new XMLHttpRequest();
 request.open('GET', url);
-request.onreadystatechange = function () {
+request.onreadystatechange = () => {
     if (request.readyState != 4) {
         // リクエスト中
     } else if (request.status != 200) {
@@ -24,7 +22,7 @@ request.onreadystatechange = function () {
 request.send(null);
 
 // scriptからリクエストが飛んできたら実行される処理
-chrome.runtime.onMessage.addListener(function (request, _, sendResponse) {
+chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
   if(request.status == "start") {
     let newMsg
     // 新しいメッセージがあるかどうかをチェック
@@ -90,6 +88,6 @@ function setter(msg) {
     return;
   }
   // Save it using the Chrome extension storage API.
-  chrome.storage.sync.set({'msg': msg}, function() {
+  chrome.storage.sync.set({'msg': msg}, () => {
   });
 }

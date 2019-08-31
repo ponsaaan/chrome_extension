@@ -1,15 +1,13 @@
 const BASE_URL = 'https://lzpwr97xdc.execute-api.ap-northeast-1.amazonaws.com/demo'
-// とりあえず静的に保存
+let count = 0;
 let msgObject;
-let count = 0
-
+let request = [];
+readSettings();
 msgObject = getArticles();
 
 // scriptからリクエストが飛んできたら実行される処理
 chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
   if(request.status == "start") {
-    console.log(msgObject)
-
     let newMsg
     // 新しいメッセージがあるかどうかをチェック
     let isExistMsg = checker(msgObject)
@@ -18,7 +16,7 @@ chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
     if(isExistMsg) {
       newMsg = getter(msgObject);
     } else {
-      newMsg = '新しいメッセージはありません'
+      newMsg = null
     }
 
     if(newMsg) {
@@ -29,8 +27,19 @@ chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
       sendResponse({ status: "notGo" });
     }
   }
+  if(request.status == "article_settings") {
+    request = request.request
+  }
   sendResponse({ status: "invalid request" });
 });
+
+// ユーザーの設定を読み込む
+function readSettings() {
+  // どの記事をリクエストするかの設定
+
+  // 記事を流すスピードの設定
+
+}
 
 // APIを叩いて記事情報を取得する
 function getArticles() {
@@ -39,26 +48,29 @@ function getArticles() {
     request.onreadystatechange = () => {
         if (request.readyState != 4) {
             // リクエスト中
-            msgObject = null;
-        } else if (request.status != 200) {
-            // 失敗
-            console.error('通信に失敗しました');
-            msgObject = null;
-        } else {
+            return null;
+        } else if (request.status == 200 && request.responseText) {
             // 取得成功
             let msgString = request.responseText;
-            msgObject = JSON.parse(msgString)
+            return JSON.parse(msgString);
+        } else {
+            // 失敗
+            console.error('通信に失敗しました');
+            return null;
         }
     }
-    request.send(null);
-    return msgObject;
+    if(request.length != 0) {
+        request.send(request);
+    } else {
+        request.send(null);
+    }
 }
 
 // 新しく値が入っているかをチェックする
-function checker(msgArray) {
+function checker(msgObject) {
 
   // そもそも何もなければfalse
-  if(msgArray.length == 0) {
+  if(msgObject == null || Object.keys(msgObject).length == 0) {
     return false;
   }
   return true;
@@ -70,7 +82,7 @@ function getter(msgArray) {
   newMsg = msgArray[0]
   // 一度取り出したら削除
   msgArray.shift()
-  return newMsg
+  return newMsg;
 }
 
 // storageにメッセージを保存する。

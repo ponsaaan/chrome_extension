@@ -7,7 +7,6 @@ $('body').before('<div id="flash"></div>');
 // 定期定期にbackgroundと通信を行う処理
 setInterval(() => {
   sender();
-  console.log("ループ中");
 }, TRANSMISSION_INTERVAL_MS);
 
 // backgroundにリクエストを送る処理
@@ -20,7 +19,7 @@ function sender() {
     } else if(response.status == "notGo") {
       console.log("新しいメッセージがありません");
     } else {
-      console.log("不正なリクエストです");
+      console.error("不正なリクエストです");
     }
   });
 }
@@ -40,8 +39,6 @@ function display() {
 function handleMsg(msg, link) {
   const DIV = document.createElement('div');
   const A_TAG = document.createElement('a');
-  console.log(msg);
-  console.log(link);
   A_TAG.setAttribute('href', link);
   A_TAG.innerText = msg;
   DIV.appendChild(A_TAG)

@@ -1,41 +1,28 @@
+const BASE_URL = 'https://lzpwr97xdc.execute-api.ap-northeast-1.amazonaws.com/demo'
 // とりあえず静的に保存
-let msgDict = {}
-let url = 'https://pu1yzwrjuh.execute-api.ap-northeast-1.amazonaws.com/prod?ID=2019062301'
+let msgObject;
+let count = 0
 
-let request = new XMLHttpRequest();
-request.open('GET', url);
-request.onreadystatechange = () => {
-    if (request.readyState != 4) {
-        // リクエスト中
-    } else if (request.status != 200) {
-        // 失敗
-    } else {
-        // 取得成功
-        msgDict = request.responseText;
-        // json化のためにstringの中身を調整
-        msgDict = msgDict.replace('value', ', "value"')
-        msgDict = msgDict.replace('ID', '"ID"')
-        msgDict = JSON.parse(msgDict)
-    }
-};
-
-request.send(null);
+msgObject = getArticles();
 
 // scriptからリクエストが飛んできたら実行される処理
 chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
   if(request.status == "start") {
+    console.log(msgObject)
+
     let newMsg
     // 新しいメッセージがあるかどうかをチェック
-    let existKey = checker(2019062301, 'value')
+    let isExistMsg = checker(msgObject)
 
-    // ID=2019062301, インデックスが0番目の新しいメッセージを取得
-    if(existKey) {
-      newMsg = getter(2019062301, 'value', existKey);
+    // 新しいメッセージを１つ取得
+    if(isExistMsg) {
+      newMsg = getter(msgObject);
     } else {
       newMsg = '新しいメッセージはありません'
     }
 
     if(newMsg) {
+      // ストレージにメッセージを一件セットする
       setter(newMsg);
       sendResponse({ status: "go" });
     } else {
@@ -45,38 +32,44 @@ chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
   sendResponse({ status: "invalid request" });
 });
 
-// 新しく値が入っているかをチェックする
-function checker(id, value) {
+// APIを叩いて記事情報を取得する
+function getArticles() {
+    let request = new XMLHttpRequest();
+    request.open('GET', BASE_URL);
+    request.onreadystatechange = () => {
+        if (request.readyState != 4) {
+            // リクエスト中
+            msgObject = null;
+        } else if (request.status != 200) {
+            // 失敗
+            console.error('通信に失敗しました');
+            msgObject = null;
+        } else {
+            // 取得成功
+            let msgString = request.responseText;
+            msgObject = JSON.parse(msgString)
+        }
+    }
+    request.send(null);
+    return msgObject;
+}
 
-  // idが違えばfalse
-　if(id != 2019062301) {
-    return;
-  }
+// 新しく値が入っているかをチェックする
+function checker(msgArray) {
 
   // そもそも何もなければfalse
-  if(Object.keys(msgDict[value]).length == 0) {
-    return;
+  if(msgArray.length == 0) {
+    return false;
   }
-
-  // メッセージが存在しなければfalse
-  for(key in msgDict[value]) {
-    if(msgDict[value][key].length == 0) {
-      return;
-    } else {
-      return key
-    }
-  }
-  return;
+  return true;
 }
 
 // 新しいメッセージを取得する
-function getter(id, value, existKey) {
-
-  let msgDescription = msgDict[value][existKey]
+function getter(msgArray) {
   // 配列の一番最初を取り出す
-  newMsg = msgDescription[0]
+  newMsg = msgArray[0]
   // 一度取り出したら削除
-  msgDescription.shift()
+  msgArray.shift()
   return newMsg
 }
 
@@ -87,7 +80,7 @@ function setter(msg) {
   if (!msg) {
     return;
   }
-  // Save it using the Chrome extension storage API.
+  // Chrome extension storage APIを使って保存する
   chrome.storage.sync.set({'msg': msg}, () => {
   });
 }

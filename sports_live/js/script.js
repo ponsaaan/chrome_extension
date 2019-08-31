@@ -1,10 +1,10 @@
 const TRANSMISSION_INTERVAL_MS = 8000;
-const DISPLAY_TIME_MS = 10000;
+const DISPLAY_TIME_MS = 8000;
 
 $('body').before('<div id="dammie"></div>');
 $('body').before('<div id="flash"></div>');
 
-// 1分ごとにbackgroundと通信を行う処理
+// 定期定期にbackgroundと通信を行う処理
 setInterval(() => {
   sender();
   console.log("ループ中");
@@ -15,7 +15,7 @@ function sender() {
   chrome.runtime.sendMessage({ status: "start" }, (response) => {
   
     if(response.status == "go") {
-      console.log("displayメソッドを実行します");
+      // ストレージにセットされたメッセージを表示する
       display();
     } else if(response.status == "notGo") {
       console.log("新しいメッセージがありません");
@@ -25,21 +25,24 @@ function sender() {
   });
 }
 
-// storageに'msg'というkeyで保存されているメッセージを取得して表示する
 function display() {
+  let responseTitle = "";
+  let link = "";
+  // storageに'msg'というkeyで保存されているメッセージを取得する
   chrome.storage.sync.get(['msg'], (result) => {
-    let answerText = result.msg;
-    console.log("storageから" + answerText + "を取得しました");
-    console.log("#flashを書き換えます");
-    handleMsg(answerText);
+    msgJson = result.msg;
+    responseTitle = msgJson['title']
+    link = msgJson['link']
+    handleMsg(responseTitle, link);
   });
 }
 
-function handleMsg(msg) {
-  // 全てgoogle.comへのリンクを設定する
+function handleMsg(msg, link) {
   const DIV = document.createElement('div');
   const A_TAG = document.createElement('a');
-  A_TAG.setAttribute('href', 'https://www.google.com/');
+  console.log(msg);
+  console.log(link);
+  A_TAG.setAttribute('href', link);
   A_TAG.innerText = msg;
   DIV.appendChild(A_TAG)
 
@@ -57,10 +60,10 @@ function handleMsg(msg) {
   // メッセージのフォント
   DIV.style.position = 'fixed'
   DIV.style.left = window.innerWidth + 'px'
-  DIV.style.top = 5 + 'px'
+  DIV.style.top = 2 + 'px'
   DIV.style.fontSize = 16 + 'px'
   DIV.style.fontWeight = 'bold'
-  DIV.style.color = '#000000'
+  DIV.style.color = '#FFFFFF'
   DIV.style.whiteSpace = 'pre'
   DIV.style.zIndex = 2147483647
 

@@ -1,4 +1,4 @@
-const BASE_URL = 'https://lzpwr97xdc.execute-api.ap-northeast-1.amazonaws.com/demo'
+const BASE_URL = 'https://lzpwr97xdc.execute-api.ap-northeast-1.amazonaws.com/demo';
 let count = 0;
 let msgObject;
 let requestArticle = ['hatena', 'qiita'];
@@ -17,9 +17,6 @@ async function getArticles() {
     let hatena = await getHatena()
     // ID=2（qiitaの記事を取得）
     let qiita = await getQiita()
-
-    console.log(hatena)
-    console.log(qiita)
 
     return {
         'hatena': hatena,
@@ -79,11 +76,9 @@ function setter(msg) {
 }
 
 (async() => {
-    console.log('hello')
     // readSettings();
     msgObject = await getArticles();
     console.log(msgObject);
-
     // scriptからリクエストが飛んできたら実行される処理
     chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
       if(request.status == "start") {
@@ -112,5 +107,5 @@ function setter(msg) {
       }
       sendResponse({ status: "invalid request" });
     });
-})
+})();
 

@@ -1,10 +1,10 @@
-const TRANSMISSION_INTERVAL_MS = 8000;
+const TRANSMISSION_INTERVAL_MS = 10000;
 const DISPLAY_TIME_MS = 8000;
 
 $('body').before('<div id="dammie"></div>');
 $('body').before('<div id="flash"></div>');
 
-// 定期定期にbackgroundと通信を行う処理
+// 定期にbackgroundと通信を行う処理
 setInterval(() => {
   sender();
 }, TRANSMISSION_INTERVAL_MS);
@@ -12,7 +12,6 @@ setInterval(() => {
 // backgroundにリクエストを送る処理
 function sender() {
   chrome.runtime.sendMessage({ status: "start" }, (response) => {
-  
     if(response.status == "go") {
       // ストレージにセットされたメッセージを表示する
       display();

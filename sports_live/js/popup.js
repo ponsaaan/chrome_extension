@@ -1,5 +1,4 @@
 $("input[type=checkbox]").on("change", () => {
-  console.log('changed')
   let request = [];
   let $checkbox = $('input[type=checkbox]')
   let length_of_settings = $checkbox.length
@@ -10,7 +9,6 @@ $("input[type=checkbox]").on("change", () => {
       request.push($checkbox[i].value)
     }
   }
-  console.log('request: '+request)
   // backgroundにリクエストを飛ばす
   chrome.runtime.sendMessage({ status: "article_settings", request: request }, (response) => {
   });

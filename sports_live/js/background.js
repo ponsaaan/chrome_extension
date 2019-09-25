@@ -1,37 +1,7 @@
 const BASE_URL = 'https://lzpwr97xdc.execute-api.ap-northeast-1.amazonaws.com/demo'
 let count = 0;
 let msgObject;
-let request = [];
-readSettings();
-msgObject = getArticles();
-
-// scriptからリクエストが飛んできたら実行される処理
-chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
-  if(request.status == "start") {
-    let newMsg
-    // 新しいメッセージがあるかどうかをチェック
-    let isExistMsg = checker(msgObject)
-
-    // 新しいメッセージを１つ取得
-    if(isExistMsg) {
-      newMsg = getter(msgObject);
-    } else {
-      newMsg = null
-    }
-
-    if(newMsg) {
-      // ストレージにメッセージを一件セットする
-      setter(newMsg);
-      sendResponse({ status: "go" });
-    } else {
-      sendResponse({ status: "notGo" });
-    }
-  }
-  if(request.status == "article_settings") {
-    request = request.request
-  }
-  sendResponse({ status: "invalid request" });
-});
+let requestArticle = ['hatena', 'qiita'];
 
 // ユーザーの設定を読み込む
 function readSettings() {
@@ -42,27 +12,38 @@ function readSettings() {
 }
 
 // APIを叩いて記事情報を取得する
-function getArticles() {
-    let request = new XMLHttpRequest();
-    request.open('GET', BASE_URL);
-    request.onreadystatechange = () => {
-        if (request.readyState != 4) {
-            // リクエスト中
-            return null;
-        } else if (request.status == 200 && request.responseText) {
-            // 取得成功
-            let msgString = request.responseText;
-            return JSON.parse(msgString);
-        } else {
-            // 失敗
-            console.error('通信に失敗しました');
-            return null;
-        }
+async function getArticles() {
+    // ID=1（hatenaの記事を取得）
+    let hatena = await getHatena()
+    // ID=2（qiitaの記事を取得）
+    let qiita = await getQiita()
+
+    console.log(hatena)
+    console.log(qiita)
+
+    return {
+        'hatena': hatena,
+        'qiita': qiita
     }
-    if(request.length != 0) {
-        request.send(request);
-    } else {
-        request.send(null);
+}
+
+async function getQiita() {
+    try {
+        let res = await fetch(BASE_URL + '?ID=1');
+        let json = await res.json();
+        return json;
+    } catch(error) {
+        console.log(error)
+    }
+}
+
+async function getHatena() {
+    try {
+        let res = await fetch(BASE_URL + '?ID=2');
+        let json = await res.json();
+        return json;
+    } catch(error) {
+        console.log(error)
     }
 }
 
@@ -96,3 +77,40 @@ function setter(msg) {
   chrome.storage.sync.set({'msg': msg}, () => {
   });
 }
+
+(async() => {
+    console.log('hello')
+    // readSettings();
+    msgObject = await getArticles();
+    console.log(msgObject);
+
+    // scriptからリクエストが飛んできたら実行される処理
+    chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
+      if(request.status == "start") {
+        // ユーザーの設定情報から表示する記事をランダムに１つ読み込む
+        let genreOfArticle = requestArticle[Math.floor(Math.random() * requestArticle.length)]
+        let newMsg
+
+        // 新しいメッセージを１つ取得
+        if(msgObject != null && Object.keys(msgObject).length != 0 && checker(msgObject[genreOfArticle])) {
+          newMsg = getter(msgObject[genreOfArticle]);
+        } else {
+          newMsg = null
+        }
+
+        if(newMsg) {
+          // ストレージにメッセージを一件セットする
+          setter(newMsg);
+          sendResponse({ status: "go" });
+        }
+        console.log(newMsg)
+        sendResponse({ status: "notGo" });
+      }
+      if(request.status == "article_settings") {
+        requestArticle = request.request
+        console.log(requestArticle)
+      }
+      sendResponse({ status: "invalid request" });
+    });
+})
+

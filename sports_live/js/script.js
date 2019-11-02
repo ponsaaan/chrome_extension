@@ -41,6 +41,7 @@ function handleMsg(msg, link) {
   A_TAG.setAttribute('href', link);
   A_TAG.setAttribute('target', '_blank');
   A_TAG.setAttribute('rel', 'noopener noreferrer');
+  A_TAG.style.color = "#FFFFFF"
   A_TAG.innerText = msg;
   DIV.appendChild(A_TAG)
 
@@ -60,6 +61,7 @@ function handleMsg(msg, link) {
   DIV.style.left = window.innerWidth + 'px'
   DIV.style.top = 2 + 'px'
   DIV.style.fontSize = 16 + 'px'
+  
   DIV.style.fontWeight = 'bold'
   DIV.style.whiteSpace = 'pre'
   DIV.style.zIndex = 2147483647

@@ -39,6 +39,8 @@ function handleMsg(msg, link) {
   const DIV = document.createElement('div');
   const A_TAG = document.createElement('a');
   A_TAG.setAttribute('href', link);
+  A_TAG.setAttribute('target', '_blank');
+  A_TAG.setAttribute('rel', 'noopener noreferrer');
   A_TAG.innerText = msg;
   DIV.appendChild(A_TAG)
 

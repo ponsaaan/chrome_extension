@@ -10,7 +10,8 @@
   height: 24px;
   font-size: 24px;
   border: 1px solid red;
-  background-color: white;
+  background-color:#424242;
+  font-family: arial, sans-serif;
   text-align: center;
   vertical-align: middle;
   position: fixed;

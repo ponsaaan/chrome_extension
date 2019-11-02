@@ -25,13 +25,13 @@ async function getArticles() {
 }
 
 async function getQiita() {
-    try {
-        let res = await fetch(BASE_URL + '?ID=1');
-        let json = await res.json();
-        return json;
-    } catch(error) {
-        console.log(error)
-    }
+  try {
+    let res = await fetch(BASE_URL + '?ID=1');
+    let json = await res.json();
+    return json;
+  } catch(error) {
+    console.log(error)
+  }
 }
 
 async function getHatena() {
@@ -46,7 +46,6 @@ async function getHatena() {
 
 // 新しく値が入っているかをチェックする
 function checker(msgObject) {
-
   // そもそも何もなければfalse
   if(msgObject == null || Object.keys(msgObject).length == 0) {
     return false;
@@ -72,6 +71,7 @@ function setter(msg) {
   }
   // Chrome extension storage APIを使って保存する
   chrome.storage.sync.set({'msg': msg}, () => {
+    return true;
   });
 }
 
@@ -97,15 +97,17 @@ function setter(msg) {
           // ストレージにメッセージを一件セットする
           setter(newMsg);
           sendResponse({ status: "go" });
+        } else {
+          console.log(newMsg)
+          sendResponse({ status: "notGo" });
         }
-        console.log(newMsg)
-        sendResponse({ status: "notGo" });
-      }
-      if(request.status == "article_settings") {
+      } else if(request.status == "article_settings") {
         requestArticle = request.request
         console.log(requestArticle)
+      } else {
+        sendResponse({ status: "invalid request" });
       }
-      sendResponse({ status: "invalid request" });
+      return true;
     });
 })();
 

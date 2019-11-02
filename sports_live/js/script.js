@@ -61,7 +61,6 @@ function handleMsg(msg, link) {
   DIV.style.top = 2 + 'px'
   DIV.style.fontSize = 16 + 'px'
   DIV.style.fontWeight = 'bold'
-  DIV.style.color = '#FFFFFF'
   DIV.style.whiteSpace = 'pre'
   DIV.style.zIndex = 2147483647
 

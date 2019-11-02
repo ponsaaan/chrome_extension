@@ -9,6 +9,8 @@ setInterval(() => {
   sender();
 }, TRANSMISSION_INTERVAL_MS);
 
+$('#flash a')
+
 // backgroundにリクエストを送る処理
 function sender() {
   chrome.runtime.sendMessage({ status: "start" }, (response) => {
@@ -39,6 +41,7 @@ function handleMsg(msg, link) {
   const DIV = document.createElement('div');
   const A_TAG = document.createElement('a');
   A_TAG.setAttribute('href', link);
+  A_TAG.setAttribute('class', 'message');
   A_TAG.setAttribute('target', '_blank');
   A_TAG.setAttribute('rel', 'noopener noreferrer');
   A_TAG.innerText = msg;

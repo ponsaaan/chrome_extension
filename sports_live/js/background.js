@@ -8,7 +8,6 @@ function readSettings() {
   // どの記事をリクエストするかの設定
 
   // 記事を流すスピードの設定
-
 }
 
 // APIを叩いて記事情報を取得する
@@ -71,7 +70,6 @@ function setter(msg) {
   }
   // Chrome extension storage APIを使って保存する
   chrome.storage.sync.set({'msg': msg}, () => {
-    return true;
   });
 }
 
@@ -96,6 +94,9 @@ function setter(msg) {
         if(newMsg) {
           // ストレージにメッセージを一件セットする
           setter(newMsg);
+//          (async() => {
+//            setter(newMsg);
+//          })();
           sendResponse({ status: "go" });
         } else {
           console.log(newMsg)
@@ -107,7 +108,6 @@ function setter(msg) {
       } else {
         sendResponse({ status: "invalid request" });
       }
-      return true;
     });
 })();
 
